@@ -1,0 +1,23 @@
+name: Daily economic calendar to Slack
+on:
+  schedule:
+    # 08:00 Stockholm = 06:00 UTC summer, 07:00 UTC winter.
+    - cron: "0 6,7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  send-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Send report
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python calendar_to_slack.py
