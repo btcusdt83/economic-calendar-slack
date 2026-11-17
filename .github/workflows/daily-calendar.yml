@@ -1,8 +1,8 @@
 name: Daily economic calendar to Slack
 on:
   schedule:
-    # 08:00 Stockholm = 06:00 UTC summer, 07:00 UTC winter.
-    - cron: "0 6,7 * * *"
+    - cron: "0 8 * * *"
+      timezone: "Europe/Stockholm"
   workflow_dispatch:
 
 permissions:
