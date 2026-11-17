@@ -7,6 +7,64 @@ from zoneinfo import ZoneInfo
 SOURCE = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
 TZ = ZoneInfo("Europe/Stockholm")
 
+TITLE_TRANSLATIONS = {
+    "BOE Gov Bailey Speaks": "Tal av Bank of Englands chef Bailey",
+    "Fed Chairman Warsh Speaks": "Tal av Fed-chefen Warsh",
+    "RBA Gov Bullock Speaks": "Tal av Australiens centralbankschef Bullock",
+    "CPI": "KPI (inflation)",
+    "Core CPI": "Kärn-KPI",
+    "Median CPI": "Median-KPI",
+    "Trimmed CPI": "Trimmat KPI",
+    "Retail Sales": "Detaljhandel",
+    "Core Retail Sales": "Underliggande detaljhandel",
+    "Employment Change": "Förändring i sysselsättningen",
+    "Unemployment Rate": "Arbetslöshet",
+    "Inflation Expectations": "Inflationsförväntningar",
+    "FOMC Meeting Minutes": "Protokoll från Feds räntemöte",
+    "Non-Farm Employment Change": "Nya jobb utanför jordbruket (NFP)",
+    "ADP Non-Farm Employment Change": "ADP: nya jobb i privat sektor",
+    "Average Hourly Earnings": "Genomsnittlig timlön",
+    "Unemployment Claims": "Nya ansökningar om arbetslöshetsersättning",
+    "Federal Funds Rate": "Feds styrränta",
+    "FOMC Statement": "Feds räntebesked",
+    "FOMC Press Conference": "Feds presskonferens",
+    "FOMC Economic Projections": "Feds ekonomiska prognoser",
+    "Official Bank Rate": "Styrränta",
+    "Monetary Policy Statement": "Penningpolitiskt besked",
+    "Monetary Policy Report": "Penningpolitisk rapport",
+    "ECB Press Conference": "Europeiska centralbankens presskonferens",
+    "Main Refinancing Rate": "ECB:s huvudsakliga refinansieringsränta",
+    "Cash Rate": "Styrränta",
+    "Overnight Rate": "Styrränta (dagslåneränta)",
+    "BOC Rate Statement": "Kanadas centralbanks räntebesked",
+    "RBA Rate Statement": "Australiens centralbanks räntebesked",
+    "GDP": "BNP",
+    "Advance GDP": "Preliminär BNP",
+    "Prelim GDP": "Preliminär BNP",
+    "Final GDP": "Slutlig BNP",
+    "PPI": "Producentprisindex",
+    "Core PPI": "Underliggande producentprisindex",
+    "Core PCE Price Index": "Kärn-PCE (Feds inflationsmått)",
+    "PCE Price Index": "PCE-prisindex",
+    "ISM Manufacturing PMI": "ISM:s inköpschefsindex för industrin",
+    "ISM Services PMI": "ISM:s inköpschefsindex för tjänstesektorn",
+    "Flash Manufacturing PMI": "Preliminärt inköpschefsindex för industrin",
+    "Flash Services PMI": "Preliminärt inköpschefsindex för tjänstesektorn",
+    "CB Consumer Confidence": "Konsumentförtroende (Conference Board)",
+    "Prelim UoM Consumer Sentiment": "Preliminärt konsumentförtroende (Michigan)",
+    "JOLTS Job Openings": "Lediga jobb (JOLTS)",
+    "Trade Balance": "Handelsbalans",
+    "Durable Goods Orders": "Orderingång för varaktiga varor",
+    "Core Durable Goods Orders": "Underliggande orderingång för varaktiga varor"
+}
+PERIOD_TRANSLATIONS = {"m/m": "månadsförändring", "q/q": "kvartalsförändring", "y/y": "årsförändring"}
+
+def translate_title(title):
+    base, separator, period = title.rpartition(" ")
+    if separator and period in PERIOD_TRANSLATIONS:
+        return f"{TITLE_TRANSLATIONS.get(base, base)} ({PERIOD_TRANSLATIONS[period]})"
+    return TITLE_TRANSLATIONS.get(title, title)
+
 def fetch_events():
     request = urllib.request.Request(SOURCE, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(request, timeout=30) as response:
@@ -31,16 +89,16 @@ def format_report(events, now):
         if local_time.date() == today:
             filtered.append((local_time, event))
     filtered.sort(key=lambda entry: entry[0])
-    lines = [f"*Today's high-impact economic calendar – {today:%Y-%m-%d}*", "🔴 High Impact | Stockholm time"]
+    lines = [f"*Dagens viktiga ekonomiska nyheter – {today:%Y-%m-%d}*", "🔴 Hög påverkan | Svensk tid"]
     if not filtered:
-        lines.append("No high-impact events are listed for today.")
+        lines.append("Inga nyheter med hög påverkan är listade för idag.")
     for local_time, event in filtered:
-        title = str(event.get("title", "Unknown event"))
+        title = translate_title(str(event.get("title", "Okänd händelse")))
         country = event.get("country", "–")
-        forecast = event.get("forecast") or "Not available"
-        previous = event.get("previous") or "Not available"
-        lines.append(f"*{local_time:%H:%M} | {country} | {title}*\nForecast: {forecast} | Previous: {previous}")
-    lines.append("Source: Forex Factory. Calendar details may change.")
+        forecast = event.get("forecast") or "Ej angivet"
+        previous = event.get("previous") or "Ej angivet"
+        lines.append(f"*{local_time:%H:%M} | {country} | {title}*\nPrognos: {forecast} | Föregående: {previous}")
+    lines.append("Källa: Forex Factory. Kalenderuppgifter kan ändras.")
     return "\n\n".join(lines)
 
 def main():
