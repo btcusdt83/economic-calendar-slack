@@ -1,6 +1,6 @@
 # Ekonomisk kalender → Slack
 
-Automatisk svensk rapport med dagens **High Impact**-nyheter från Forex Factory, prognos, föregående värde och svensk tid.
+Automatisk engelsk rapport med dagens **High Impact**-nyheter från Forex Factory, prognos, föregående värde och svensk tid.
 
 ## Aktivera Slack
 1. Gå till https://api.slack.com/apps och skapa en app.
@@ -11,9 +11,9 @@ Automatisk svensk rapport med dagens **High Impact**-nyheter från Forex Factory
 6. Under **Actions → Daily economic calendar to Slack → Run workflow** kan du testköra.
 
 ## Tider
-GitHub Actions schemaläggs 06:00 och 07:00 UTC. Skriptet skickar bara när svensk tid är 08:00. Detta hanterar sommar-/vintertid. GitHub kan fördröja schemalagda jobb.
+GitHub Actions schemaläggs dagligen kl. 08:00 med `timezone: Europe/Stockholm`, vilket automatiskt hanterar sommar- och vintertid. Försenade jobb skickar fortfarande rapporten. GitHub kan fördröja eller tappa schemalagda jobb; exakt leverans kl. 08:00 garanteras inte. I publika repositoryn stängs schemat av efter 60 dagar utan repositoryaktivitet.
 
 ## Källa och begränsningar
 Datakälla: https://nfs.faireconomy.media/ff_calendar_thisweek.json
 
-Tillgänglighet och användningsvillkor behöver verifieras. Om datakällan är nere misslyckas körningen; den hittar inte på nyheter. Endast `impact: High` inkluderas. Vissa titlar har svenska översättningar, andra behåller engelska originaltitlar.
+Tillgänglighet och användningsvillkor behöver verifieras. Om datakällan är nere misslyckas körningen; den hittar inte på nyheter. Endast `impact: High` inkluderas. Rapporten använder engelska originaltitlar och visar tider i Europe/Stockholm.
