@@ -3,12 +3,8 @@ name: Daily economic calendar to Slack
 
 on:
   schedule:
-    # 08:00 svensk sommartid (CEST)
-    - cron: "0 6 * * *"
-
-    # 08:00 svensk vintertid (CET)
-    - cron: "0 7 * * *"
-
+    - cron: '0 6 * * *'
+    - cron: '0 7 * * *'
   workflow_dispatch:
 
 permissions:
@@ -20,9 +16,8 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Check Swedish local time
+      - name: Check Swedish time
         id: swedish_time
-        shell: bash
         run: |
           HOUR=$(TZ=Europe/Stockholm date +%H)
           if [ "$HOUR" = "08" ]; then
@@ -31,17 +26,17 @@ jobs:
             echo "send=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Checkout repository
+      - name: Checkout
         if: steps.swedish_time.outputs.send == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         if: steps.swedish_time.outputs.send == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
-      - name: Send report to Slack
+      - name: Send to Slack
         if: steps.swedish_time.outputs.send == 'true' || github.event_name == 'workflow_dispatch'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
